@@ -1,0 +1,21 @@
+{
+  "extends": ["prettier"],
+  "root": true,
+  "env": {
+    "node": true,
+    "es6": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020
+  },
+  "globals": {},
+  "plugins": ["prettier"],
+  "rules": {
+    "no-mixed-operators": 0,
+    "prefer-promise-reject-errors": 0,
+    "no-sequences": 0,
+    "no-console": 0,
+    "import/first": 0,
+    "prettier/prettier": "error"
+  }
+}
