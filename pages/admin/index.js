@@ -16,22 +16,7 @@ import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
 import { useFormik } from 'formik';
 
-const widgets = [
-  {
-    type: "text",
-    label: "Texto",
-    fields: {
-      text: { type: "textarea", label: "Texto " }
-    },
-  },  
-  {
-    type: "video",
-    label: "Vídeo",
-    fields: {
-      video: { type: "text", label: "Video Url" }
-    },
-  }
-];
+import widgets from '../../src/widgets'
 
 const fields = {
   textarea: {
