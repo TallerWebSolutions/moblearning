@@ -1,3 +1,4 @@
+import React, { useRef } from 'react'
 import ReactYoutube from 'react-youtube'
 import getYoutubeId from 'get-youtube-id'
 import { Typography } from '@material-ui/core'
@@ -18,9 +19,21 @@ const widgets = [
     fields: {
       video: { type: "text", label: "Video Url" }
     },
-    component: ({ values }) => (
-      <div><ReactYoutube videoId={getYoutubeId(values.video)} /></div>
-    )
+    component: ({ values }) => {
+      const ytRef = useRef(null);
+      
+      console.log(ytRef)
+      console.log(ytRef.current)
+      return (
+        <div>
+          <ReactYoutube
+            ref={ytRef}
+            videoId={getYoutubeId(values.video)}
+            onStateChange={console.log}
+          />
+        </div>
+      )
+    }
   }
 ];
 
