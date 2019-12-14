@@ -1,7 +1,7 @@
-import React, { useRef } from 'react'
-import ReactYoutube from 'react-youtube'
-import getYoutubeId from 'get-youtube-id'
-import { Typography } from '@material-ui/core'
+import React, { useRef } from "react"
+import ReactYoutube from "react-youtube"
+import getYoutubeId from "get-youtube-id"
+import { Typography } from "@material-ui/core"
 const widgets = [
   {
     type: "text",
@@ -9,10 +9,8 @@ const widgets = [
     fields: {
       text: { type: "textarea", label: "Texto " }
     },
-    component: ({ values }) => (
-      <Typography>{values.text}</Typography>
-    )
-  },  
+    component: ({ values }) => <Typography>{values.text}</Typography>
+  },
   {
     type: "video",
     label: "Vídeo",
@@ -20,8 +18,8 @@ const widgets = [
       video: { type: "text", label: "Video Url" }
     },
     component: ({ values }) => {
-      const ytRef = useRef(null);
-      
+      const ytRef = useRef(null)
+
       console.log(ytRef)
       console.log(ytRef.current)
       return (
@@ -34,7 +32,14 @@ const widgets = [
         </div>
       )
     }
+  },
+  {
+    type: "quiz",
+    label: "Quiz",
+    fields: {
+      quiz: { type: "quiz", label: "Insira sua pergunta" }
+    }
   }
-];
+]
 
 export default widgets
