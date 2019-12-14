@@ -54,6 +54,39 @@ const data = {
           }
         }
       ]
+    },
+    {
+      "id": "0eea2b6e-dddf-43c8-b7ee-991d03651136",
+      "name": "Conclusão",
+      "contents": [
+        {
+          "type": "quiz",
+          "values": {
+            "quiz": {
+              "question": "O que é?",
+              "correctAnswer": "a",
+              "answers": [
+                {
+                  "text": "resposta 1",
+                  "value": "a"
+                },
+                {
+                  "text": "resposta 2",
+                  "value": "b"
+                },
+                {
+                  "text": "resposta 3",
+                  "value": "c"
+                },
+                {
+                  "text": "resposta 4",
+                  "value": "d"
+                }
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }
@@ -85,19 +118,23 @@ const DrupalPage = props => {
           </Stepper>
         </Grid>
         <Grid item xs={9}>
-          <Typography variant='h3' gutterBottom>{activeContent.name}</Typography>
-          {activeContent.contents.map(content => {
-            const widget = widgets.find(w => w.type === content.type)
-            const Component = widget.component
-            return <Component values={content.values} />
-          })}
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={e => setActiveStep(activeStep + 1)}
-          >
-            Avançar
-          </Button>
+          <Grid item xs={12}>
+            <Typography variant='h3' gutterBottom>{activeContent.name}</Typography>
+            {activeContent.contents.map(content => {
+              const widget = widgets.find(w => w.type === content.type)
+              const Component = widget.component
+              return <Component values={content.values} />
+            })}
+          </Grid>
+          <Grid item xs={12}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={e => setActiveStep(activeStep + 1)}
+            >
+              Avançar
+            </Button>
+          </Grid>
         </Grid>
       </Grid>
     </div>

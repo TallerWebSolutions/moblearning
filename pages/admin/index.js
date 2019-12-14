@@ -14,19 +14,20 @@ import Grid from "@material-ui/core/Grid"
 import InputLabel from "@material-ui/core/InputLabel"
 import FormControl from "@material-ui/core/FormControl"
 import { useFormik } from "formik"
+import Quiz from './fields/Quiz'
 
 import widgets from "../../src/widgets"
 
 const fields = {
   textarea: {
     defaultValue: "",
-    component: ({ label, ...props }) => (
-      <TextField multiline label={label} {...props} fullWidth />
+    component: ({ label, onChange, ...props }) => (
+      <TextField multiline label={label} {...props} onChange={e => onChange(e.target.value)} fullWidth />
     )
   },
   text: {
     defaultValue: "",
-    component: ({ label, ...props }) => <TextField label={label} {...props} />
+    component: ({ label, onChange, ...props }) => <TextField label={label} {...props} onChange={e => onChange(e.target.value)} />
   },
   quiz: Quiz.metadata
 }
@@ -84,7 +85,6 @@ const AdminPage = props => {
       }),
       {}
     )
-    console.log(values)
     contents.push({ type: widget.type, values })
 
     formik.setFieldValue(`lessons[${index}].contents`, contents)
@@ -150,7 +150,7 @@ const AdminPage = props => {
                     display="flex"
                     alignItems="center"
                     mb={2}
-                    key={index + lesson.name}
+                    key={index}
                   >
                     <Box mr={2}>
                       <Avatar>{index + 1}</Avatar>
@@ -159,12 +159,12 @@ const AdminPage = props => {
                       placeholder="Título da lição"
                       name={`lessons[${index}]`}
                       value={formik.values.lessons[index].name}
-                      onChange={e =>
+                      onChange={e => {
                         formik.setFieldValue(
                           `lessons[${index}].name`,
                           e.target.value
                         )
-                      }
+                      }}
                     />
                     <CreateIcon onClick={e => setActiveLessonId(lesson.id)} />
                   </Box>
@@ -201,11 +201,11 @@ const AdminPage = props => {
                                 <Component
                                   label={widget.fields[fieldName].label}
                                   value={content.values[fieldName]}
-                                  onChange={e =>
+                                  onChange={value =>
                                     setActiveLessonFieldValue(
                                       contentIndex,
                                       fieldName,
-                                      e.target.value
+                                      value
                                     )
                                   }
                                 />

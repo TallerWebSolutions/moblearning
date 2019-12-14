@@ -9,79 +9,73 @@ import {
   FormControlLabel
 } from "@material-ui/core"
 import { useFormik } from "formik"
-import { useState, useCallback } from "react"
+import { useState, useEffect } from "react"
 
 const Quiz = ({ label, value, onChange }) => {
   const [formState, setFormState] = useState(value)
 
-  const onChangeForm = choice => e => {
-    console.log({ choice, e })
+  useEffect(() => {
+    onChange(formState)
+  }, [formState])
+
+  const setState = (override) => {
+    setFormState(s => ({ ...s, ...override }))
   }
 
-  const onChangeQuestion = e => {
-    console.log({ e })
-  }
+  const bindForm = (name) => ({
+    onChange: e => {
+      setState({ [name]: e.target.value })
+    },
+    value: formState[name]
+  })
 
-  const correctAnswer = value.answers.find(({ isCorrect }) => isCorrect)
+  const setAnswerState = (answerIndex, override, cb) => {
+    setFormState(s => ({
+      ...s,
+      answers: s.answers.map((answer, index) => (
+        answerIndex === index ? { ...answer, ...override } : answer
+      ))
+    }))
+  }
 
   return (
-    <FormControl component="fieldset">
-      <TextField label={label} />
-      <RadioGroup
-        aria-label="answer"
-        name="answer1"
-        value={correctAnswer || correctAnswer.value}
-        onChange={onChangeQuestion}
-      >
-        <FormControlLabel
-          value="a"
-          control={<Radio />}
-          label={
-            <TextField
-              placeholder="Inserir uma resposta"
-              onChange={onChangeForm("a")}
+    <>
+      <FormControl component="fieldset">
+        <TextField label={label} {...bindForm('question')} />
+        <RadioGroup
+          onChange={e => setState({ correctAnswer: e.target.value })}
+          value={formState.correctAnswer}
+        >
+          {formState.answers.map((answer, index) => (
+            <FormControlLabel
+              value={answer.value}
+              control={<Radio />}
+              label={
+                <TextField
+                  placeholder="Inserir uma resposta"
+                  value={answer.text}
+                  onChange={e => setAnswerState(index, { text: e.target.value })}
+                />
+              }
             />
-          }
-        />
-        <FormControlLabel
-          value="b"
-          control={<Radio />}
-          label={
-            <TextField
-              placeholder="Inserir uma resposta"
-              onChange={onChangeForm("b")}
-            />
-          }
-        />
-        <FormControlLabel
-          value="c"
-          control={<Radio />}
-          label={
-            <TextField
-              placeholder="Inserir uma resposta"
-              onChange={onChangeForm("c")}
-            />
-          }
-        />
-        <FormControlLabel
-          value="d"
-          control={<Radio />}
-          label={
-            <TextField
-              placeholder="Inserir uma resposta"
-              onChange={onChangeForm("d")}
-            />
-          }
-        />
-      </RadioGroup>
-    </FormControl>
+          ))}
+        </RadioGroup>
+      </FormControl>
+      <pre>{JSON.stringify(formState, null, 2)}</pre>
+    </>
   )
 }
 
 Quiz.metadata = {
   defaultValue: {
     question: null,
-    answers: [{ text: null, isCorrect: false, value: null }]
+    correctAnswer: null,
+    answers: [
+      { text: null, value: 'a' },
+      { text: null, value: 'b' },
+      { text: null, value: 'c' },
+      { text: null, value: 'd' },
+    ]
   },
   component: Quiz
 }
