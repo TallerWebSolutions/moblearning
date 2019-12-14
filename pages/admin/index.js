@@ -14,29 +14,59 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Grid from '@material-ui/core/Grid'
 import InputLabel from '@material-ui/core/InputLabel'
 import FormControl from '@material-ui/core/FormControl'
-import { useFormik, Field } from 'formik';
-import Menu from "@material-ui/core/Menu";
+import { useFormik } from 'formik';
 
 const widgets = [
   {
-    name: "text",
+    type: "text",
     label: "Texto",
-    component: props => <h1>Text</h1>
+    fields: {
+      text: { type: "textarea", label: "Texto " },
+      azeitona: { type: "text", label: "Azeitona" }
+    },
+  },  
+  {
+    type: "video",
+    label: "Vídeo",
+    fields: {
+      video: { type: "text", label: "Video Url" }
+    },
   }
 ];
 
-const AdminPage = props => {
+const fields = {
+  textarea: {
+    defaultValue: '',
+    component: ({ label, ...props }) => <TextField multiline label={label} {...props} />
+  },
+  text: {
+    defaultValue: '',
+    component: ({ label, ...props }) => <TextField label={label} {...props} />
+  }
+}
 
+const WidgetButton = ({ label, ...props }) => (
+  <Box
+    display="flex"
+    flexDirection="column"
+    justifyContent="center"
+    {...props}
+  >
+    <Avatar>{label[0]}</Avatar>
+    <Box>{label}</Box>
+  </Box>
+)
+
+const AdminPage = props => {
   const formik = useFormik({
     initialValues: {
       category: '',
       name: '',
-      // lessons: [],
       lessons: [
         {
           "id": "0eea2b6e-dddf-43c8-b7ee-991d03651136",
           "name": "",
-          "fields": []
+          "contents": []
         }
       ],
     },
@@ -48,40 +78,37 @@ const AdminPage = props => {
   const bindField = name => ({
     name, onChange: formik.handleChange, value: formik.values[name]
   })
-
-  const [formState, setFormState] = useState({
-    category: '',
-    name: ''
-  })
   
-  const [anchorEl, setAnchorEl] = React.useState(null)
-  const [activeLesson, setActiveLesson] = useState(null)
-  const [lessons, setLessons] = useState([])
-  const [menuState, handleMenuState] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null)
+  const [activeLessonId, setActiveLessonId] = useState("0eea2b6e-dddf-43c8-b7ee-991d03651136")
+  const activeLesson = formik.values.lessons.find(lesson => lesson.id === activeLessonId)
 
-  const handleMenu = event => {
-    setAnchorEl(event.currentTarget);
-  }
-
-  const handleMenuClose = event => {
-    setAnchorEl(null)
-  }
+  const [showWidgets, setShowWidgets] = useState(false)
   
-  const addField = (name, formik, activeLesson) => () => {
-    const widget = widgets.find(w => w.name === name)
-    const index = formik.values.lessons.findIndex(l => l.id === activeLesson.id)
-    const fields = formik.values.lessons[index].fields
-    fields.push(widget)
-    formik.setFieldValue(`lessons[${index}].fields`, fields)
-    // setContents(c => [...c, { widget, id: uuid(), state: {} }]);
-    // handleMenuState(false);
+  const addContent = (type, formik, activeLessonId) => () => {
+    const widget = widgets.find(w => w.type === type)
+    const index = formik.values.lessons.findIndex(l => l.id === activeLessonId)
+  
+    const contents = formik.values.lessons[index].contents
+    const values = Object.keys(widget.fields).reduce((acc, fieldName) => ({
+        ...acc,
+        [fieldName]: fields[widget.fields[fieldName].type].defaultValue
+    }), {})
+    console.log(values)
+    contents.push({ type: widget.type, values })
+
+    formik.setFieldValue(`lessons[${index}].contents`, contents)
+    setShowWidgets(false)
   }
 
   const addLesson = () =>
-    formik.setFieldValue('lessons', [...formik.values.lessons, { id: uuid(), name: '', fields: [] }])
+    formik.setFieldValue('lessons', [...formik.values.lessons, { id: uuid(), name: '', contents: [] }])
 
-  const editLesson = (id, override = {}) =>
-    setLessons(lessons => lessons.map(lesson => lesson.id === id ? { ...lesson, ...override } : lesson))
+  const setActiveLessonFieldValue = (contentIndex, name, value) => {
+    const index = formik.values.lessons.findIndex(l => l.id === activeLessonId)
+    const content = formik.values.lessons[index].contents[contentIndex]
+    formik.setFieldValue(`lessons[${index}].contents[${contentIndex}].values.${name}`, value)
+  }
 
   return (
     <div>
@@ -127,7 +154,7 @@ const AdminPage = props => {
                       onChange={e => formik.setFieldValue(`lessons[${index}].name`, e.target.value)}
                     />
                     <CreateIcon
-                      onClick={e => setActiveLesson(formik.values.lessons[index])}
+                      onClick={e => setActiveLessonId(lesson.id)}
                     />
                   </Box>
                 ))}
@@ -143,32 +170,66 @@ const AdminPage = props => {
               </Fab>
               </Box>
             </Grid>
+
             <Grid item xs={6}>
-              { activeLesson && (
+              {activeLesson && (
                 <div>
-                  <Button
-                    aria-controls="simple-menu"
-                    aria-haspopup="true"
-                    onClick={handleMenu}
-                  >
-                    Open Menu
-                  </Button>
-                  <Menu
-                    id="simple-menu"
-                    keepMounted
-                    anchorEl={anchorEl}
-                    open={Boolean(anchorEl)}
-                    onClose={handleMenuClose}
-                  >
-                    {widgets.map(widget => (
-                      <MenuItem value={widget.name} onClick={addField(widget.name, formik, activeLesson )}>
-                        {widget.label}
-                      </MenuItem>
-                    ))}
-                  </Menu>
-                  {activeLesson.fields.map(field => (
-                    <h1>{field.label}</h1>
-                  ))}
+                  {activeLesson.contents.map((content, contentIndex) => {
+                    const widget = widgets.find(w => w.type === content.type)
+                    return (
+                      <Box bgcolor="#ECECEC" p={2} display="flex" mb={2}>
+                        <Box mr={1}>
+                          <Avatar>{widget.label[0]}</Avatar>
+                        </Box>
+                        <Box>
+                          {Object.keys(content.values).map(fieldName => {
+                            const field = fields[widget.fields[fieldName].type]
+                            const Component = field.component
+                            return (
+                              <Box mb={2} key={fieldName}>
+                                <Component
+                                  label={widget.fields[fieldName].label}
+                                  value={content.values[fieldName]}
+                                  onChange={e => setActiveLessonFieldValue(contentIndex, fieldName, e.target.value)}
+                                />
+                              </Box>
+                            )
+                          })}
+                        </Box>
+                      </Box>
+                    )
+                  })}
+
+                  {showWidgets && (
+                    <Box
+                      mt={1}
+                      p={3}
+                      bgcolor="#ECECEC"
+                      display="flex"
+                      justifyContent="center"
+                    >
+                      {widgets.map(widget => (
+                        <Box m={1}>
+                          <WidgetButton
+                            label={widget.label}
+                            onClick={addContent(widget.type, formik, activeLesson.id)}
+                          />
+                        </Box>
+                      ))}
+                    </Box>
+                  )}
+
+                  {!showWidgets && (
+                    <Box
+                      border="1px dashed #CCC"
+                      p={3}
+                      display="flex"
+                      justifyContent="center"
+                    >
+                      <Fab onClick={() => setShowWidgets(true)}><AddIcon /></Fab>
+                    </Box>
+                  )}
+
                 </div>
               )}
             </Grid>
