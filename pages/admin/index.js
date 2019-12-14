@@ -21,8 +21,7 @@ const widgets = [
     type: "text",
     label: "Texto",
     fields: {
-      text: { type: "textarea", label: "Texto " },
-      azeitona: { type: "text", label: "Azeitona" }
+      text: { type: "textarea", label: "Texto " }
     },
   },  
   {

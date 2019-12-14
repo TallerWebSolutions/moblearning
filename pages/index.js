@@ -1,36 +1,42 @@
-import { withApollo } from '../apollo/client'
-import gql from 'graphql-tag'
 import Link from 'next/link'
-import { useQuery } from '@apollo/react-hooks'
+import Paper from '@material-ui/core/Paper'
+import Container from '@material-ui/core/Container'
+import { Typography, styled } from '@material-ui/core'
+import Grid from '@material-ui/core/Grid'
+import Avatar from '@material-ui/core/Avatar'
 
-const ViewerQuery = gql`
-  query ViewerQuery {
-    viewer {
-      id
-      name
-      status
-    }
-  }
-`
+const PaperStyled = styled(Paper)({
+  padding: '1rem'
+})
 
 const Index = () => {
-  const {
-    data: { viewer },
-  } = useQuery(ViewerQuery)
-
-  if (viewer) {
-    return (
-      <div>
-        You're signed in as {viewer.name} and you're {viewer.status} goto{' '}
-        <Link href="/about">
-          <a>static</a>
-        </Link>{' '}
-        page.
-      </div>
-    )
-  }
-
-  return null
+  return (
+    <Container maxWidth='xs'>
+      <Grid container spacing={3}>
+      <Typography variant="h3" component='h1' gutterBottom>Escolha a categoria</Typography>
+        <Grid item xs={6}>
+          <Link href='/category/drupal'>
+            <PaperStyled elevation={2} p='1rem'>
+              <Grid container spacing={4} justify='center' direction='column' align='center'>
+                <Avatar>D</Avatar>
+                <Typography>Drupal</Typography>
+              </Grid>
+            </PaperStyled>
+          </Link>
+        </Grid>
+        <Grid item xs={6}>
+          <Link href='/categoryreact'>
+            <PaperStyled elevation={2}>
+              <Grid container spacing={4} justify='center' direction='column' align='center'>
+                <Avatar>R</Avatar>
+                <Typography>React</Typography>
+              </Grid>
+            </PaperStyled>
+          </Link>
+        </Grid>
+      </Grid>
+    </Container>
+  )
 }
 
-export default withApollo(Index)
+export default Index
